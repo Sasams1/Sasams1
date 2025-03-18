@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://sasams1.github.io/Sasams1/sitemap.xml
