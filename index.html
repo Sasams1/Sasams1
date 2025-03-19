@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدونة نسخ المواقع - دليلك الشامل</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <style>
+        /* تنسيق عام */
+        body {
+            background-color: #121212;
+            color: #ddd;
+            font-family: Arial, sans-serif;
+        }
+
+        /* شريط التنقل */
+        .navbar {
+            background: #1b1b1b;
+            padding: 15px;
+            box-shadow: 0px 4px 10px rgba(0, 255, 0, 0.2);
+        }
+
+        .navbar-brand {
+            color: #00ff00 !important;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .nav-link {
+            color: #ddd !important;
+            margin-left: 15px;
+            transition: 0.3s;
+        }
+
+        .nav-link:hover {
+            color: #00ff00 !important;
+        }
+
+        /* العنوان الرئيسي */
+        .hero {
+            text-align: center;
+            padding: 70px 20px;
+            background: linear-gradient(135deg, #1b1b1b, #222);
+            box-shadow: 0px 0px 15px rgba(0, 255, 0, 0.2);
+        }
+
+        .hero h1 {
+            font-size: 42px;
+            font-weight: bold;
+            color: #00ff00;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: #bbb;
+        }
+
+        /* الأزرار */
+        .btn-custom {
+            background: #00ff00;
+            color: black;
+            font-weight: bold;
+            padding: 12px 20px;
+            font-size: 18px;
+            border-radius: 8px;
+            transition: 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 255, 0, 0.5);
+        }
+
+        .btn-custom:hover {
+            background: #00cc00;
+            transform: scale(1.1);
+        }
+
+        /* محتوى المقال */
+        .blog-content {
+            padding: 50px 20px;
+        }
+
+        .blog-content h2 {
+            color: #00ff00;
+            margin-bottom: 20px;
+        }
+
+        .blog-content p {
+            line-height: 1.8;
+            color: #ccc;
+        }
+
+        /* تأثيرات عند التمرير */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: 0.8s ease-in-out;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* الحقوق */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background: #1b1b1b;
+            margin-top: 50px;
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        /* زر تغيير اللغة */
+        .lang-switcher {
+            background: #00ff00;
+            color: black;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 15px;
+        }
+
+        /* زر خارج القائمة */
+        .lang-switcher-external {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        /* قسم المميزات */
+        .features {
+            padding: 50px 20px;
+            background: #1b1b1b;
+            margin-top: 30px;
+        }
+
+        .features h2 {
+            color: #00ff00;
+            margin-bottom: 20px;
+        }
+
+        .features ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .features ul li {
+            background: #222;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+            color: #ddd;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- شريط التنقل -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">مدونة نسخ المواقع</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#">الرئيسية</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">أدوات</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">اتصل بنا</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- العنوان الرئيسي -->
+    <header class="hero">
+        <h1 id="hero-title">انسخ أي موقع بسهولة!</h1>
+        <p id="hero-description">تعلم كيفية استخراج الأكواد وتحليل مواقع الويب خطوة بخطوة</p>
+        <a href="#content" class="btn-custom" id="start-button">ابدأ الآن</a>
+    </header>
+
+    <!-- محتوى المقال -->
+    <div class="container blog-content" id="content">
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <h2 class="fade-in" id="what-is-copying">ما هو نسخ المواقع؟</h2>
+                <p class="fade-in" id="what-is-copying-text">
+                    نسخ المواقع هو عملية استخراج أكواد HTML و CSS و JavaScript من صفحات الويب بهدف تحليلها أو إعادة استخدامها.
+                    يمكن استخدام هذه التقنية لأغراض متعددة مثل التعلم، تحسين التصاميم، أو إنشاء مواقع مشابهة.
+                </p>
+
+                <h2 class="fade-in" id="methods">طرق نسخ المواقع</h2>
+                <ul class="fade-in" id="methods-list">
+                    <li><strong>Inspect Element:</strong> فتح كود المصدر عبر المتصفح.</li>
+                    <li><strong>أدوات Web Scraping:</strong> مثل Selenium و BeautifulSoup.</li>
+                    <li><strong>استخدام HTTrack:</strong> تحميل الموقع بالكامل.</li>
+                    <li><strong>View Page Source:</strong> رؤية أكواد الصفحة مباشرة.</li>
+                </ul>
+
+                <h2 class="fade-in" id="tools">أدوات تحليل المواقع</h2>
+                <ul class="fade-in" id="tools-list">
+                    <li>**Wappalyzer** - يكشف التقنيات المستخدمة في أي موقع.</li>
+                    <li>**BuiltWith** - يحلل بنية أي موقع ويب.</li>
+                    <li>**WhatRuns** - يحدد الإضافات والتقنيات التي يعمل بها الموقع.</li>
+                </ul>
+
+                <h2 class="fade-in" id="try-tool">جرب أداة النسخ الآن</h2>
+                <p class="fade-in" id="try-tool-text">يمكنك الآن تجربة أداة نسخ المواقع الخاصة بنا، فقط اضغط على الزر أدناه:</p>
+                <a href="https://sasams1.github.io/Sasams1/" class="btn-custom fade-in" id="open-copier">افتح الناسخ</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- قسم المميزات -->
+    <div class="features">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-10 mx-auto">
+                    <h2 class="fade-in" id="features-title">مميزات أداة النسخ</h2>
+                    <ul class="fade-in" id="features-list">
+                        <li>**سهولة الاستخدام**: واجهة بسيطة وسهلة للتعامل.</li>
+                        <li>**دعم متعدد اللغات**: يدعم العربية والإنجليزية.</li>
+                        <li>**تحميل سريع**: يقوم بتحميل المواقع بسرعة فائقة.</li>
+                        <li>**تحليل شامل**: يحلل جميع عناصر الموقع بدقة.</li>
+                        <li>**دعم تقنيات حديثة**: يدعم HTML5, CSS3, JavaScript الحديثة.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- الحقوق -->
+    <div class="footer">
+        <p id="footer-rights">جميع الحقوق محفوظة &copy; 2025</p>
+        <p id="footer-email">البريد الإلكتروني: vghhhhhhhhh65@gmail.com</p>
+        <p id="footer-country">البلد: مصر</p>
+        <p id="footer-name">مصطفى حسين</p>
+    </div>
+
+    <!-- زر تغيير اللغة خارج القائمة -->
+    <button class="lang-switcher lang-switcher-external" onclick="toggleLanguage()">English</button>
+
+    <script>
+        // كائن يحتوي على النصوص باللغتين
+        const translations = {
+            ar: {
+                heroTitle: "انسخ أي موقع بسهولة!",
+                heroDescription: "تعلم كيفية استخراج الأكواد وتحليل مواقع الويب خطوة بخطوة",
+                startButton: "ابدأ الآن",
+                whatIsCopying: "ما هو نسخ المواقع؟",
+                whatIsCopyingText: "نسخ المواقع هو عملية استخراج أكواد HTML و CSS و JavaScript من صفحات الويب بهدف تحليلها أو إعادة استخدامها. يمكن استخدام هذه التقنية لأغراض متعددة مثل التعلم، تحسين التصاميم، أو إنشاء مواقع مشابهة.",
+                methods: "طرق نسخ المواقع",
+                methodsList: [
+                    "<strong>Inspect Element:</strong> فتح كود المصدر عبر المتصفح.",
+                    "<strong>أدوات Web Scraping:</strong> مثل Selenium و BeautifulSoup.",
+                    "<strong>استخدام HTTrack:</strong> تحميل الموقع بالكامل.",
+                    "<strong>View Page Source:</strong> رؤية أكواد الصفحة مباشرة."
+                ],
+                tools: "أدوات تحليل المواقع",
+                toolsList: [
+                    "**Wappalyzer** - يكشف التقنيات المستخدمة في أي موقع.",
+                    "**BuiltWith** - يحلل بنية أي موقع ويب.",
+                    "**WhatRuns** - يحدد الإضافات والتقنيات التي يعمل بها الموقع."
+                ],
+                tryTool: "جرب أداة النسخ الآن",
+                tryToolText: "يمكنك الآن تجربة أداة نسخ المواقع الخاصة بنا، فقط اضغط على الزر أدناه:",
+                openCopier: "افتح الناسخ",
+                featuresTitle: "مميزات أداة النسخ",
+                featuresList: [
+                    "**سهولة الاستخدام**: واجهة بسيطة وسهلة للتعامل.",
+                    "**دعم متعدد اللغات**: يدعم العربية والإنجليزية.",
+                    "**تحميل سريع**: يقوم بتحميل المواقع بسرعة فائقة.",
+                    "**تحليل شامل**: يحلل جميع عناصر الموقع بدقة.",
+                    "**دعم تقنيات حديثة**: يدعم HTML5, CSS3, JavaScript الحديثة."
+                ],
+                footerRights: "جميع الحقوق محفوظة &copy; 2025",
+                footerEmail: "البريد الإلكتروني: vghhhhhhhhh65@gmail.com",
+                footerCountry: "البلد: مصر",
+                footerName: "مصطفى حسين"
+            },
+            en: {
+                heroTitle: "Copy Any Website Easily!",
+                heroDescription: "Learn how to extract codes and analyze websites step by step",
+                startButton: "Start Now",
+                whatIsCopying: "What is Website Copying?",
+                whatIsCopyingText: "Website copying is the process of extracting HTML, CSS, and JavaScript codes from web pages for the purpose of analyzing or reusing them. This technique can be used for various purposes such as learning, improving designs, or creating similar websites.",
+                methods: "Website Copying Methods",
+                methodsList: [
+                    "<strong>Inspect Element:</strong> Open the source code via the browser.",
+                    "<strong>Web Scraping Tools:</strong> Such as Selenium and BeautifulSoup.",
+                    "<strong>Using HTTrack:</strong> Download the entire website.",
+                    "<strong>View Page Source:</strong> View the page source directly."
+                ],
+                tools: "Website Analysis Tools",
+                toolsList: [
+                    "**Wappalyzer** - Detects technologies used on any website.",
+                    "**BuiltWith** - Analyzes the structure of any website.",
+                    "**WhatRuns** - Identifies the plugins and technologies a website runs on."
+                ],
+                tryTool: "Try the Copy Tool Now",
+                tryToolText: "You can now try our website copying tool, just click the button below:",
+                openCopier: "Open Copier",
+                featuresTitle: "Features of the Copy Tool",
+                featuresList: [
+                    "**Easy to Use**: Simple and user-friendly interface.",
+                    "**Multi-Language Support**: Supports Arabic and English.",
+                    "**Fast Loading**: Downloads websites at high speed.",
+                    "**Comprehensive Analysis**: Analyzes all website elements accurately.",
+                    "**Modern Technologies**: Supports HTML5, CSS3, and modern JavaScript."
+                ],
+                footerRights: "All rights reserved &copy; 2025",
+                footerEmail: "Email: vghhhhhhhhh65@gmail.com",
+                footerCountry: "Country: Egypt",
+                footerName: "Mostafa Hussein"
+            }
+        };
+
+        let currentLang = 'ar'; // اللغة الافتراضية
+
+        // دالة لتغيير اللغة
+        function toggleLanguage() {
+            currentLang = currentLang === 'ar' ? 'en' : 'ar';
+            updateContent();
+            document.querySelectorAll('.lang-switcher').forEach(button => {
+                button.textContent = currentLang === 'ar' ? 'English' : 'العربية';
+            });
+        }
+
+        // دالة لتحديث المحتوى بناءً على اللغة
+        function updateContent() {
+            const langData = translations[currentLang];
+            document.getElementById('hero-title').textContent = langData.heroTitle;
+            document.getElementById('hero-description').textContent = langData.heroDescription;
+            document.getElementById('start-button').textContent = langData.startButton;
+            document.getElementById('what-is-copying').textContent = langData.whatIsCopying;
+            document.getElementById('what-is-copying-text').textContent = langData.whatIsCopyingText;
+            document.getElementById('methods').textContent = langData.methods;
+            document.getElementById('methods-list').innerHTML = langData.methodsList.map(item => `<li>${item}</li>`).join('');
+            document.getElementById('tools').textContent = langData.tools;
+            document.getElementById('tools-list').innerHTML = langData.toolsList.map(item => `<li>${item}</li>`).join('');
+            document.getElementById('try-tool').textContent = langData.tryTool;
+            document.getElementById('try-tool-text').textContent = langData.tryToolText;
+            document.getElementById('open-copier').textContent = langData.openCopier;
+            document.getElementById('features-title').textContent = langData.featuresTitle;
+            document.getElementById('features-list').innerHTML = langData.featuresList.map(item => `<li>${item}</li>`).join('');
+            document.getElementById('footer-rights').textContent = langData.footerRights;
+            document.getElementById('footer-email').textContent = langData.footerEmail;
+            document.getElementById('footer-country').textContent = langData.footerCountry;
+            document.getElementById('footer-name').textContent = langData.footerName;
+        }
+
+        // تحويل اللغة تلقائيًا عند الدخول للموقع
+        function detectLanguage() {
+            const userLang = navigator.language || navigator.userLanguage;
+            if (userLang.startsWith('en')) {
+                currentLang = 'en';
+                updateContent();
+                document.querySelectorAll('.lang-switcher').forEach(button => {
+                    button.textContent = 'العربية';
+                });
+            }
+        }
+
+        detectLanguage(); // الكشف التلقائي عن اللغة
+
+        document.addEventListener("scroll", function() {
+            let elements = document.querySelectorAll(".fade-in");
+            elements.forEach(el => {
+                let position = el.getBoundingClientRect().top;
+                let screenHeight = window.innerHeight;
+                if (position < screenHeight - 100) {
+                    el.classList.add("visible");
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
