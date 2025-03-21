@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أداة جلب أكواد المواقع</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- CodeMirror CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 170, 255, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(0, 170, 255, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 170, 255, 0); }
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            60% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes scrollUp {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0); }
+        }
+
+        @keyframes scrollDown {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(10px); }
+            100% { transform: translateY(0); }
+        }
+
+        @keyframes notificationFade {
+            0% { opacity: 0; transform: translateY(-20px); }
+            10% { opacity: 1; transform: translateY(0); }
+            90% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-20px); }
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #121212 0%, #1e1e1e 100%);
+            color: #fff;
+            animation: fadeIn 0.8s ease-in-out;
+            min-height: 100vh;
+            padding-bottom: 100px;
+            transition: all 0.3s ease;
+        }
+
+        body.light-mode {
+            background: linear-gradient(135deg, #f4f4f4 0%, #e0e0e0 100%);
+            color: #000;
+        }
+
+        .toolbar {
+            background: rgba(34, 34, 34, 0.95);
+            backdrop-filter: blur(12px);
+            padding: 15px 25px;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.5);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(0, 170, 255, 0.2);
+        }
+
+        body.light-mode .toolbar {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.15);
+            border-bottom: 2px solid rgba(0, 136, 204, 0.2);
+        }
+
+        .toolbar .name {
+            font-size: 22px;
+            font-weight: bold;
+            color: #00ff00;
+            letter-spacing: 1.5px;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+
+        .toolbar .buttons button {
+            background: linear-gradient(45deg, #00aaff, #00ccff);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-left: 10px;
+        }
+
+        .toolbar .buttons button:hover {
+            background: linear-gradient(45deg, #0088cc, #00aaff);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 136, 204, 0.5);
+        }
+
+        .container {
+            margin-top: 40px;
+            padding: 0 20px;
+            animation: slideUp 0.8s ease-in-out;
+        }
+
+        .input-group {
+            max-width: 700px;
+            margin: 0 auto 40px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            border-radius: 25px;
+            overflow: hidden;
+        }
+
+        #urlInput {
+            background: #1e1e1e;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            transition: all 0.3s ease;
+        }
+
+        #urlInput:focus {
+            box-shadow: inset 0 0 10px rgba(0, 170, 255, 0.5);
+            outline: none;
+        }
+
+        body.light-mode #urlInput {
+            background: #fff;
+            color: #000;
+        }
+
+        .input-group .btn-submit {
+            background: linear-gradient(45deg, #00aaff, #00ccff);
+            border: none;
+            padding: 12px 25px;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+            transition: all 0.3s ease;
+        }
+
+        .input-group .btn-submit:hover {
+            background: linear-gradient(45deg, #0088cc, #00aaff);
+            animation: none;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 136, 204, 0.5);
+        }
+
+        .CodeMirror {
+            height: 250px !important;
+            border: 1px solid #333;
+            border-radius: 10px;
+            font-size: 14px;
+            background: #1e1e1e;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        body.light-mode .CodeMirror {
+            background: #fff;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .CodeMirror-scroll {
+            scrollbar-width: thin;
+            scrollbar-color: #00aaff #333;
+        }
+
+        .CodeMirror-scroll::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .CodeMirror-scroll::-webkit-scrollbar-track {
+            background: #333;
+            border-radius: 10px;
+        }
+
+        .CodeMirror-scroll::-webkit-scrollbar-thumb {
+            background: #00aaff;
+            border-radius: 10px;
+            transition: background 0.3s ease;
+        }
+
+        .CodeMirror-scroll::-webkit-scrollbar-thumb:hover {
+            background: #0088cc;
+        }
+
+        body.light-mode .CodeMirror-scroll {
+            scrollbar-color: #0088cc #e0e0e0;
+        }
+
+        body.light-mode .CodeMirror-scroll::-webkit-scrollbar-track {
+            background: #e0e0e0;
+        }
+
+        body.light-mode .CodeMirror-scroll::-webkit-scrollbar-thumb {
+            background: #0088cc;
+        }
+
+        .scroll-btns {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            z-index: 10;
+        }
+
+        .scroll-up-btn, .scroll-down-btn {
+            background: linear-gradient(45deg, #00aaff, #00ccff);
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .scroll-up-btn:hover {
+            background: linear-gradient(45deg, #0088cc, #00aaff);
+            animation: scrollUp 0.5s infinite;
+            transform: translateY(-2px);
+        }
+
+        .scroll-down-btn:hover {
+            background: linear-gradient(45deg, #0088cc, #00aaff);
+            animation: scrollDown 0.5s infinite;
+            transform: translateY(2px);
+        }
+
+        .btn-custom {
+            background: linear-gradient(45deg, #00aaff, #00ccff);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 5px;
+            font-weight: bold;
+            animation: bounceIn 0.5s ease;
+        }
+
+        .btn-custom:hover {
+            background: linear-gradient(45deg, #0088cc, #00aaff);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 136, 204, 0.5);
+        }
+
+        .save-btn {
+            background: linear-gradient(45deg, #28a745, #34d058);
+        }
+
+        .save-btn:hover {
+            background: linear-gradient(45deg, #218838, #28a745);
+        }
+
+        .download-btn {
+            background: linear-gradient(45deg, #ff9500, #ffaa33);
+        }
+
+        .download-btn:hover {
+            background: linear-gradient(45deg, #e68600, #ff9500);
+        }
+
+        .format-btn {
+            background: linear-gradient(45deg, #ff00ff, #ff66ff);
+        }
+
+        .format-btn:hover {
+            background: linear-gradient(45deg, #cc00cc, #ff00ff);
+        }
+
+        .clear-btn {
+            background: linear-gradient(45deg, #ff3333, #ff6666);
+        }
+
+        .clear-btn:hover {
+            background: linear-gradient(45deg, #cc0000, #ff3333);
+        }
+
+        .search-container {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+            max-width: 300px;
+        }
+
+        .search-input {
+            background: #1e1e1e;
+            color: #fff;
+            border: 1px solid #333;
+            border-radius: 25px;
+            padding: 8px 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .search-input:focus {
+            border-color: #00aaff;
+            box-shadow: 0 0 10px rgba(0, 170, 255, 0.5);
+            outline: none;
+        }
+
+        body.light-mode .search-input {
+            background: #fff;
+            color: #000;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .highlight {
+            background: rgba(255, 255, 0, 0.4);
+            border: 2px solid #ffcc00;
+            padding: 2px;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(255, 204, 0, 0.7);
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(34, 34, 34, 0.95);
+            backdrop-filter: blur(12px);
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #ccc;
+            z-index: 999;
+            border-top: 2px solid rgba(0, 170, 255, 0.2);
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        body.light-mode .footer {
+            background: rgba(255, 255, 255, 0.95);
+            color: #666;
+            border-top: 2px solid rgba(0, 136, 204, 0.2);
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .scroll-to-top {
+            position: fixed;
+            bottom: 110px;
+            right: 20px;
+            background: #00aaff;
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: none;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 136, 204, 0.4);
+        }
+
+        .scroll-to-top:hover {
+            background: #0088cc;
+            transform: translateY(-5px);
+        }
+
+        .preview-container {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 1400px;
+            height: 90%;
+            background: #1e1e1e;
+            border-radius: 15px;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .preview-header {
+            background: #222;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 15px 15px 0 0;
+            font-weight: bold;
+            border-bottom: 2px solid #00aaff;
+        }
+
+        .preview-header button {
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .preview-header button:hover {
+            background: #cc0000;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(204, 0, 0, 0.4);
+        }
+
+        .preview-iframe {
+            width: 100%;
+            height: 92%;
+            border: none;
+            border-radius: 0 0 15px 15px;
+            background: #fff;
+        }
+
+        h2 {
+            font-size: 1.6rem;
+            margin-top: 35px;
+            margin-bottom: 15px;
+            color: #00aaff;
+            text-shadow: 0 2px 8px rgba(0, 170, 255, 0.4);
+            font-weight: bold;
+        }
+
+        body.light-mode h2 {
+            color: #0088cc;
+            text-shadow: none;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(45deg, #28a745, #34d058);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+            z-index: 2000;
+            animation: notificationFade 3s ease-in-out forwards;
+            font-weight: bold;
+            text-align: center;
+            max-width: 80%;
+        }
+
+        .notification.error {
+            background: linear-gradient(45deg, #ff4d4d, #ff6666);
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 4px;
+            background: #00aaff;
+            z-index: 2000;
+            transition: width 0.3s ease;
+        }
+
+        .editor-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="progress-bar" id="progressBar"></div>
+
+    <div class="toolbar">
+        <div class="name">مصطفى حسين</div>
+        <div class="buttons">
+            <button onclick="toggleTheme()">🌙</button>
+            <button onclick="translateText()">English</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1 class="text-center mb-5" style="font-weight: bold; color: #00ff00; text-shadow: 0 2px 10px rgba(0, 255, 0, 0.5);">أداة جلب أكواد المواقع</h1>
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="input-group">
+                    <input type="text" id="urlInput" class="form-control" placeholder="أدخل رابط الموقع">
+                    <button class="btn-submit" onclick="fetchWebsiteCode()">إرسال</button>
+                </div>
+
+                <div class="editor-container">
+                    <h2>كود HTML:</h2>
+                    <textarea id="htmlCode"></textarea>
+                    <div class="scroll-btns">
+                        <button class="scroll-up-btn" onclick="scrollToTopEditor('htmlEditor')">↑</button>
+                        <button class="scroll-down-btn" onclick="scrollToBottomEditor('htmlEditor')">↓</button>
+                    </div>
+                    <div class="search-container">
+                        <input type="text" class="search-input" id="htmlSearch" placeholder="ابحث في HTML" oninput="searchInCode('htmlEditor', this.value)">
+                    </div>
+                    <div>
+                        <button class="btn-custom" onclick="copyText('htmlEditor')">نسخ HTML</button>
+                        <button class="btn-custom" onclick="previewHTML()">معاينة HTML</button>
+                        <button class="btn-custom save-btn" onclick="updateAllWeb()">حفظ التعديلات</button>
+                        <button class="btn-custom download-btn" onclick="downloadCode('htmlEditor', 'code.html')">تحميل HTML</button>
+                        <button class="btn-custom format-btn" onclick="formatCode('htmlEditor')">تهيئة الكود</button>
+                        <button class="btn-custom clear-btn" onclick="clearCode('htmlEditor')">مسح الكود</button>
+                    </div>
+                </div>
+
+                <div class="editor-container">
+                    <h2>كود CSS:</h2>
+                    <textarea id="cssCode"></textarea>
+                    <div class="scroll-btns">
+                        <button class="scroll-up-btn" onclick="scrollToTopEditor('cssEditor')">↑</button>
+                        <button class="scroll-down-btn" onclick="scrollToBottomEditor('cssEditor')">↓</button>
+                    </div>
+                    <div class="search-container">
+                        <input type="text" class="search-input" id="cssSearch" placeholder="ابحث في CSS" oninput="searchInCode('cssEditor', this.value)">
+                    </div>
+                    <div>
+                        <button class="btn-custom" onclick="copyText('cssEditor')">نسخ CSS</button>
+                        <button class="btn-custom save-btn" onclick="updateAllWeb()">حفظ التعديلات</button>
+                        <button class="btn-custom download-btn" onclick="downloadCode('cssEditor', 'style.css')">تحميل CSS</button>
+                        <button class="btn-custom format-btn" onclick="formatCode('cssEditor')">تهيئة الكود</button>
+                        <button class="btn-custom clear-btn" onclick="clearCode('cssEditor')">مسح الكود</button>
+                    </div>
+                </div>
+
+                <div class="editor-container">
+                    <h2>كود JavaScript:</h2>
+                    <textarea id="jsCode"></textarea>
+                    <div class="scroll-btns">
+                        <button class="scroll-up-btn" onclick="scrollToTopEditor('jsEditor')">↑</button>
+                        <button class="scroll-down-btn" onclick="scrollToBottomEditor('jsEditor')">↓</button>
+                    </div>
+                    <div class="search-container">
+                        <input type="text" class="search-input" id="jsSearch" placeholder="ابحث في JavaScript" oninput="searchInCode('jsEditor', this.value)">
+                    </div>
+                    <div>
+                        <button class="btn-custom" onclick="copyText('jsEditor')">نسخ JavaScript</button>
+                        <button class="btn-custom save-btn" onclick="updateAllWeb()">حفظ التعديلات</button>
+                        <button class="btn-custom download-btn" onclick="downloadCode('jsEditor', 'script.js')">تحميل JS</button>
+                        <button class="btn-custom format-btn" onclick="formatCode('jsEditor')">تهيئة الكود</button>
+                        <button class="btn-custom clear-btn" onclick="clearCode('jsEditor')">مسح الكود</button>
+                    </div>
+                </div>
+
+                <div class="editor-container">
+                    <h2>All Web (ملف HTML كامل):</h2>
+                    <textarea id="allWebCode"></textarea>
+                    <div class="scroll-btns">
+                        <button class="scroll-up-btn" onclick="scrollToTopEditor('allWebEditor')">↑</button>
+                        <button class="scroll-down-btn" onclick="scrollToBottomEditor('allWebEditor')">↓</button>
+                    </div>
+                    <div class="search-container">
+                        <input type="text" class="search-input" id="allWebSearch" placeholder="ابحث في All Web" oninput="searchInCode('allWebEditor', this.value)">
+                    </div>
+                    <div>
+                        <button class="btn-custom" onclick="copyText('allWebEditor')">نسخ All Web</button>
+                        <button class="btn-custom" id="previewAllWebButton" onclick="previewAllWeb()">معاينة All Web</button>
+                        <button class="btn-custom download-btn" onclick="downloadCode('allWebEditor', 'index.html')">تحميل Index</button>
+                        <button class="btn-custom format-btn" onclick="formatCode('allWebEditor')">تهيئة الكود</button>
+                        <button class="btn-custom clear-btn" onclick="clearCode('allWebEditor')">مسح الكود</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="scroll-to-top" onclick="scrollToTop()">↑</button>
+
+    <div class="footer">
+        © 2025 مصطفى حسين. جميع الحقوق محفوظة.
+    </div>
+
+    <div class="preview-container" id="previewContainer">
+        <div class="preview-header">
+            <span>معاينة الموقع</span>
+            <button onclick="closePreview()">✖</button>
+        </div>
+        <iframe class="preview-iframe" id="previewFrame"></iframe>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- CodeMirror JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+    <script>
+        const apiKey = "476c34e4da724c3eb2958291ea60e107b1df11c9706";
+
+        // تهيئة CodeMirror لكل خانة
+        const htmlEditor = CodeMirror.fromTextArea(document.getElementById("htmlCode"), {
+            mode: "htmlmixed",
+            theme: "dracula",
+            lineNumbers: true,
+            lineWrapping: true,
+            matchBrackets: true,
+            autoCloseTags: true,
+            viewportMargin: Infinity // تحسين الأداء
+        });
+        const cssEditor = CodeMirror.fromTextArea(document.getElementById("cssCode"), {
+            mode: "css",
+            theme: "dracula",
+            lineNumbers: true,
+            lineWrapping: true,
+            matchBrackets: true,
+            autoCloseBrackets: true,
+            viewportMargin: Infinity
+        });
+        const jsEditor = CodeMirror.fromTextArea(document.getElementById("jsCode"), {
+            mode: "javascript",
+            theme: "dracula",
+            lineNumbers: true,
+            lineWrapping: true,
+            matchBrackets: true,
+            autoCloseBrackets: true,
+            viewportMargin: Infinity
+        });
+        const allWebEditor = CodeMirror.fromTextArea(document.getElementById("allWebCode"), {
+            mode: "htmlmixed",
+            theme: "dracula",
+            lineNumbers: true,
+            lineWrapping: true,
+            matchBrackets: true,
+            autoCloseTags: true,
+            viewportMargin: Infinity
+        });
+
+        async function fetchWebsiteCode() {
+            const url = document.getElementById("urlInput").value;
+            if (!url) {
+                showNotification("الرجاء إدخال رابط الموقع!", true);
+                return;
+            }
+
+            const progressBar = document.getElementById("progressBar");
+            progressBar.style.width = "0%";
+
+            try {
+                progressBar.style.width = "30%";
+                const response = await fetch(`https://api.scrape.do?token=${apiKey}&url=${encodeURIComponent(url)}`, {
+                    headers: { "Accept": "text/html" },
+                    cache: "no-store" // تحسين الأداء
+                });
+                progressBar.style.width = "70%";
+                const data = await response.text();
+
+                htmlEditor.setValue(data);
+                extractCSS_JS(data);
+                updateAllWeb();
+                progressBar.style.width = "100%";
+                setTimeout(() => progressBar.style.width = "0%", 500);
+                showNotification("تم جلب الكود بنجاح!");
+            } catch (error) {
+                console.error("حدث خطأ:", error);
+                progressBar.style.width = "0%";
+                showNotification("فشل في جلب الكود، تحقق من الرابط أو الاتصال!", true);
+            }
+        }
+
+        function extractCSS_JS(html) {
+            const cssMatches = [...html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)];
+            const jsMatches = [...html.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/gi)];
+
+            cssEditor.setValue(cssMatches.length ? cssMatches.map(m => m[1]).join("\n") : "لا يوجد CSS داخلي");
+            jsEditor.setValue(jsMatches.length ? jsMatches.map(m => m[1]).join("\n") : "لا يوجد JavaScript داخلي");
+        }
+
+        function updateAllWeb() {
+            const htmlContent = htmlEditor.getValue();
+            const cssContent = cssEditor.getValue();
+            const jsContent = jsEditor.getValue();
+
+            const fullHTML = `<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>معاينة الموقع</title>
+    <style>${cssContent}</style>
+</head>
+<body>
+    ${htmlContent}
+    <script>${jsContent}<\/script>
+</body>
+</html>`;
+
+            allWebEditor.setValue(fullHTML);
+            showNotification("تم حفظ التعديلات بنجاح!");
+        }
+
+        function copyText(editorId) {
+            const editor = { htmlEditor, cssEditor, jsEditor, allWebEditor }[editorId];
+            navigator.clipboard.writeText(editor.getValue()).then(() => {
+                showNotification("تم النسخ بنجاح!");
+            }).catch(err => {
+                console.error("فشل النسخ:", err);
+                showNotification("فشل في النسخ!", true);
+            });
+        }
+
+        function previewHTML() {
+            const htmlCode = htmlEditor.getValue();
+            const previewContainer = document.getElementById("previewContainer");
+            const previewFrame = document.getElementById("previewFrame");
+
+            if (!htmlCode) {
+                showNotification("لا يوجد محتوى HTML لمعاينته!", true);
+                return;
+            }
+
+            previewContainer.style.display = "block";
+            previewFrame.srcdoc = htmlCode;
+        }
+
+        function previewAllWeb() {
+            const allWebCode = allWebEditor.getValue();
+            const previewContainer = document.getElementById("previewContainer");
+            const previewFrame = document.getElementById("previewFrame");
+
+            if (!allWebCode) {
+                showNotification("لا يوجد محتوى كامل لمعاينته! قم بجلب الكود أو حفظ التعديلات أولاً.", true);
+                return;
+            }
+
+            previewContainer.style.display = "block";
+            previewFrame.srcdoc = allWebCode;
+        }
+
+        function closePreview() {
+            document.getElementById("previewContainer").style.display = "none";
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            body.classList.toggle('light-mode');
+            const themeToggle = document.querySelector('.toolbar .buttons button');
+            themeToggle.textContent = body.classList.contains('light-mode') ? '☀️' : '🌙';
+            const editors = [htmlEditor, cssEditor, jsEditor, allWebEditor];
+            editors.forEach(editor => editor.refresh());
+        }
+
+        function translateText() {
+            const elements = document.querySelectorAll('h1, h2, button, .name');
+            const translateButton = document.querySelector('.buttons button:nth-child(2)');
+            const isEnglish = translateButton.textContent === 'English';
+
+            elements.forEach(element => {
+                if (element.textContent.includes('أداة جلب أكواد المواقع')) {
+                    element.textContent = isEnglish ? 'Website Code Fetcher Tool' : 'أداة جلب أكواد المواقع';
+                } else if (element.textContent.includes('إرسال')) {
+                    element.textContent = isEnglish ? 'Submit' : 'إرسال';
+                } else if (element.textContent.includes('نسخ HTML')) {
+                    element.textContent = isEnglish ? 'Copy HTML' : 'نسخ HTML';
+                } else if (element.textContent.includes('معاينة HTML')) {
+                    element.textContent = isEnglish ? 'Preview HTML' : 'معاينة HTML';
+                } else if (element.textContent.includes('حفظ التعديلات')) {
+                    element.textContent = isEnglish ? 'Save Changes' : 'حفظ التعديلات';
+                } else if (element.textContent.includes('نسخ CSS')) {
+                    element.textContent = isEnglish ? 'Copy CSS' : 'نسخ CSS';
+                } else if (element.textContent.includes('نسخ JavaScript')) {
+                    element.textContent = isEnglish ? 'Copy JavaScript' : 'نسخ JavaScript';
+                } else if (element.textContent.includes('All Web')) {
+                    element.textContent = isEnglish ? 'All Web' : 'All Web';
+                } else if (element.textContent.includes('معاينة All Web')) {
+                    element.textContent = isEnglish ? 'Preview All Web' : 'معاينة All Web';
+                } else if (element.textContent.includes('تحميل HTML')) {
+                    element.textContent = isEnglish ? 'Download HTML' : 'تحميل HTML';
+                } else if (element.textContent.includes('تحميل CSS')) {
+                    element.textContent = isEnglish ? 'Download CSS' : 'تحميل CSS';
+                } else if (element.textContent.includes('تحميل JS')) {
+                    element.textContent = isEnglish ? 'Download JS' : 'تحميل JS';
+                } else if (element.textContent.includes('تحميل Index')) {
+                    element.textContent = isEnglish ? 'Download Index' : 'تحميل Index';
+                } else if (element.textContent.includes('تهيئة الكود')) {
+                    element.textContent = isEnglish ? 'Format Code' : 'تهيئة الكود';
+                } else if (element.textContent.includes('مسح الكود')) {
+                    element.textContent = isEnglish ? 'Clear Code' : 'مسح الكود';
+                } else if (element.textContent.includes('English')) {
+                    element.textContent = isEnglish ? 'العربية' : 'English';
+                }
+            });
+        }
+
+        window.onscroll = function() {
+            const scrollButton = document.querySelector('.scroll-to-top');
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                scrollButton.style.display = 'block';
+            } else {
+                scrollButton.style.display = 'none';
+            }
+        };
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showNotification(message, isError = false) {
+            const notification = document.createElement('div');
+            notification.className = 'notification' + (isError ? ' error' : '');
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+
+        function searchInCode(editorId, searchTerm) {
+            const editor = { htmlEditor, cssEditor, jsEditor, allWebEditor }[editorId];
+            editor.getAllMarks().forEach(mark => mark.clear());
+
+            if (!searchTerm) {
+                editor.execCommand("clearSearch");
+                return;
+            }
+
+            const cursor = editor.getSearchCursor(searchTerm, { line: 0, ch: 0 }, true);
+            if (cursor.findNext()) {
+                editor.setSelection(cursor.from(), cursor.to());
+                editor.scrollIntoView({ line: cursor.from().line, ch: 0 }, 100);
+                editor.markText(cursor.from(), cursor.to(), { className: "highlight" });
+
+                while (cursor.findNext()) {
+                    editor.markText(cursor.from(), cursor.to(), { className: "highlight" });
+                }
+            } else {
+                showNotification("لم يتم العثور على الكلمة!", true);
+            }
+        }
+
+        function scrollToTopEditor(editorId) {
+            const editor = { htmlEditor, cssEditor, jsEditor, allWebEditor }[editorId];
+            editor.scrollTo(null, 0);
+        }
+
+        function scrollToBottomEditor(editorId) {
+            const editor = { htmlEditor, cssEditor, jsEditor, allWebEditor }[editorId];
+            editor.scrollTo(null, editor.getScrollInfo().height);
+        }
+
+        function downloadCode(editorId, filename) {
+            const editor = { htmlEditor, cssEditor, jsEditor, allWebEditor }[editorId];
+            const content = editor.getValue();
+            if (!content) {
+                showNotification("لا يوجد كود لتحميله!", true);
+                return;
+            }
+
+            const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            const downloadPath = `تم حفظ الملف في مجلد التنزيلات باسم: ${filename}`;
+            showNotification(downloadPath);
+        }
+
+        function formatCode(editorId) {
+            const editor = { htmlEditor, cssEditor, jsEditor, allWebEditor }[editorId];
+            editor.autoFormatRange({ line: 0, ch: 0 }, { line: editor.lineCount() });
+            showNotification("تم تهيئة الكود بنجاح!");
+        }
+
+        function clearCode(editorId) {
+            const editor = { htmlEditor, cssEditor, jsEditor, allWebEditor }[editorId];
+            editor.setValue("");
+            showNotification("تم مسح الكود بنجاح!");
+        }
+
+        // تحسين الأداء
+        document.addEventListener('DOMContentLoaded', () => {
+            const editors = [htmlEditor, cssEditor, jsEditor, allWebEditor];
+            editors.forEach(editor => {
+                editor.refresh();
+                editor.setOption("renderLine", (line, elt) => { // تقليل اللاج
+                    elt.style.transition = "all 0.1s ease";
+                });
+            });
+        });
+    </script>
+</body>
+</html>
